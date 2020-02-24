@@ -103,7 +103,7 @@ void Main() {
 	{
 		if (scene == 0) {
 			Title(U"CrammmingGame").drawAt(Scene::CenterF().x, 100, Palette::Gold);
-			Title(U"Ver 2.1.0").drawAt(Scene::CenterF().x, 190, Palette::Gold);
+			Title(U"Ver 2.1.1").drawAt(Scene::CenterF().x, 190, Palette::Gold);
 			start.draw();
 			if (KeyT.pressed() && KeyH.pressed() && KeyI.pressed() && KeyS.pressed()) {
 				Scene::SetBackground(Palette::Gold);
