@@ -343,6 +343,4 @@ Intermediate
 .vs
 *debug*
 *.sln
-ExamGame/App/Probs/Datas/*
-*English*
-ExamGame/App/Probs/past/*
+ExamGame/App/Probs/*
