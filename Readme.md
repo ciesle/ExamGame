@@ -1,5 +1,5 @@
 # ExamGame
-Made By Thistle(@Thistleprogram)
+Made By Thistle(@ciesle)
 
 私はGithubの使い方に明るくないので、アプリケーションの使い方だけを適当に書いておきます。
 
