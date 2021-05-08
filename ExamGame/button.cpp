@@ -10,5 +10,5 @@ void Button::draw() {
 	font(str).drawAt(button.center());
 }
 bool Button::onclick() {
-	return valid && (button.mouseOver() && MouseL.pressed());
+	return valid && (button.mouseOver() && MouseL.down());
 }

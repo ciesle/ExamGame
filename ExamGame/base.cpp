@@ -14,16 +14,3 @@ Vec2 cpos;
 Stopwatch sw;
 
 Array<int>scores;
-
-
-Vec2 adj(Vec2 pos) {
-	if (ppos.x < 600) {
-		return pos;
-	}
-	else if (ppos.x < ssize - 600) {
-		return Vec2(pos.x - (ppos.x - 600), pos.y);
-	}
-	else {
-		return Vec2(pos.x + (1200 - ssize), pos.y);
-	}
-}

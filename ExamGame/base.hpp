@@ -2,6 +2,9 @@
 #define BASE_HPP
 
 #include <Siv3D.hpp>
+#include <windows.h>
+
+using namespace std;
 
 typedef long long ll;
 typedef double ld;
@@ -21,7 +24,4 @@ extern Vec2 cpos;
 extern Stopwatch sw;
 
 extern Array<int>scores;
-
-Vec2 adj(Vec2 pos);
-
 #endif

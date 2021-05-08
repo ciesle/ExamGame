@@ -8,6 +8,35 @@ Array<String>pnames;
 Array<Problem>probs;
 Array<int>orders;
 
+HashTable<String, String>file2dir;
+HashTable<String, int>file2size;
+
+void find_directory(wstring oFolderPath) {
+	WIN32_FIND_DATA tFindFileData;
+
+	oFolderPath += L"\\*.*";
+	HANDLE hFile = ::FindFirstFile(oFolderPath.c_str(), &tFindFileData);
+	if (INVALID_HANDLE_VALUE == hFile) return;
+	oFolderPath = oFolderPath.substr(0, oFolderPath.size() - 4);
+	do {
+		wstring wpFileName = tFindFileData.cFileName;
+		if (tFindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+			if (wpFileName == L".." || wpFileName == L"."||
+				wpFileName==L"not_referenced") {
+				continue;
+			}
+			wstring oFullPath = oFolderPath + L"\\" + wpFileName;
+			find_directory(oFullPath);
+		}
+		else {
+			wstring oFullPath = oFolderPath + L"\\" + wpFileName;
+			wstring name = wpFileName;
+			name = name.substr(0, name.size() - 4);
+			file2dir.emplace(Unicode::FromWString(name), Unicode::FromWString(oFullPath));
+		}
+	} while (::FindNextFile(hFile, &tFindFileData));
+}
+
 void init() {
 	probs.clear();
 	String str;
@@ -16,14 +45,16 @@ void init() {
 	Array<String>names;
 	for (auto g : pnames) names.push_back(g);
 	pnames.clear();
+	find_directory(L"Probs");
 	for (int _ = 0; _ < names.size(); _++) {
 		auto filename = names[_];
 		if (filename == U"") continue;
+		if (!file2dir.contains(filename)) continue;
+		filename = file2dir[filename];
 		if (already.find(filename) != already.end()) continue;
 		already.insert(filename);
-		CSVData csv(U"Probs/" + filename + U".csv");
-		if (!csv) {
-			TextReader read(U"Probs/" + filename + U".txt");
+		if (filename.back() == 't') {
+			TextReader read(filename);
 			if (!read) continue;
 			String line;
 			while (read.readLine(line)) {
@@ -35,21 +66,15 @@ void init() {
 	}
 	for (int _ = 0; _ < pnames.size(); _++) {
 		auto filename = pnames[_];
-		CSVData csv(U"Probs/" + filename + U".csv");
-		Array<bool>vailds;
-		TextReader reader(U"Probs/Datas/" + filename + U".txt");
-		while (reader.readLine(str)) {
-			vailds << Parse<int>(str);
-		}
+		Print << filename;
+		CSVData csv(filename);
+		file2size[filename] = csv.rows();
 		for (int i = 0; i < csv.rows(); i++) {
-			if (i < vailds.size()) {
-				probs << Problem(csv[i][0], csv[i][1], vailds[i], filename, i);
-				psize++;
-			}
-			else {
-				probs << Problem(csv[i][0], csv[i][1], 1, filename, i);
-				psize++;
-			}
+			if (csv[i].size() == 2)
+				probs << Problem(csv[i][0], csv[i][1], true, filename, i);
+			else
+				probs << Problem(csv[i][0], csv[i][1], csv[i][2] == U"unlearned", filename, i);
+			psize++;
 		}
 	}
 }
@@ -103,11 +128,11 @@ void Main() {
 	{
 		if (scene == 0) {
 			Title(U"CrammmingGame").drawAt(Scene::CenterF().x, 100, Palette::Gold);
-			Title(U"Ver 2.1.1").drawAt(Scene::CenterF().x, 190, Palette::Gold);
+			Title(U"Ver 2.1.2").drawAt(Scene::CenterF().x, 190, Palette::Gold);
 			start.draw();
 			if (KeyT.pressed() && KeyH.pressed() && KeyI.pressed() && KeyS.pressed()) {
 				Scene::SetBackground(Palette::Gold);
-				revtext = U"Ushitapunichia";
+				revtext = U"StudyGame";
 			}
 			if (KeyEnter.down() || (!pre_mouse && start.onclick())) {
 				scene = 1;
@@ -213,18 +238,14 @@ void Main() {
 		pre_mouse = MouseL.pressed();
 	}
 end:;
-	int res = 0;
+	int cnt = 0;
 	for (auto filename : pnames) {
-		CSVData csv(U"Probs/" + filename + U".csv");
+		CSVData csv(filename);
 		if (!csv) continue;
-		TextWriter writer(U"Probs/Datas/" + filename + U".txt");
-		for (int i = 0; i < csv.rows(); i++) {
-			if (probs[res++].valid) {
-				writer.writeln(U"1");
-			}
-			else {
-				writer.writeln(U"0");
-			}
+		TextWriter writer(filename);
+		for (int i = 0; i < file2size[filename]; i++) {
+			writer.writeln(U"{},{},{}"_fmt(probs[cnt].prob, probs[cnt].ans, (probs[cnt].valid ? U"unlearned" : U"learned")));
+			cnt++;
 		}
 	}
 }
