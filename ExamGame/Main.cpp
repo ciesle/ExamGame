@@ -66,14 +66,13 @@ void init() {
 	}
 	for (int _ = 0; _ < pnames.size(); _++) {
 		auto filename = pnames[_];
-		Print << filename;
 		CSVData csv(filename);
 		file2size[filename] = csv.rows();
 		for (int i = 0; i < csv.rows(); i++) {
 			if (csv[i].size() == 2)
 				probs << Problem(csv[i][0], csv[i][1], true, filename, i);
 			else
-				probs << Problem(csv[i][0], csv[i][1], csv[i][2] == U"unlearned", filename, i);
+				probs << Problem(csv[i][0], csv[i][1], csv[i][3] == U"unlearned", filename, i);
 			psize++;
 		}
 	}
@@ -128,7 +127,7 @@ void Main() {
 	{
 		if (scene == 0) {
 			Title(U"CrammmingGame").drawAt(Scene::CenterF().x, 100, Palette::Gold);
-			Title(U"Ver 2.1.2").drawAt(Scene::CenterF().x, 190, Palette::Gold);
+			Title(U"Ver 2.1.3").drawAt(Scene::CenterF().x, 190, Palette::Gold);
 			start.draw();
 			if (KeyT.pressed() && KeyH.pressed() && KeyI.pressed() && KeyS.pressed()) {
 				Scene::SetBackground(Palette::Gold);
@@ -244,7 +243,7 @@ end:;
 		if (!csv) continue;
 		TextWriter writer(filename);
 		for (int i = 0; i < file2size[filename]; i++) {
-			writer.writeln(U"{},{},{}"_fmt(probs[cnt].prob, probs[cnt].ans, (probs[cnt].valid ? U"unlearned" : U"learned")));
+			writer.writeln(U"{},{},,{}"_fmt(probs[cnt].prob, probs[cnt].ans, (probs[cnt].valid ? U"unlearned" : U"learned")));
 			cnt++;
 		}
 	}

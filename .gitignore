@@ -342,3 +342,6 @@ healthchecksdb
 Intermediate
 .vs
 ExamGame/App/Probs/*
+**/ExmGame
+*.zip
+*.exe
